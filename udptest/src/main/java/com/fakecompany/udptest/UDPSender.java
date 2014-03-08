@@ -12,11 +12,20 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-/**
- * Created by cypressf on 3/7/14.
+/* Code for device communication between an android smartphone (hopefully Google Glass too!)
+ * and a webapp (for now, we're using node.js). *
+ * Currently can send strings of data, now we're trying to figure out how to stream video. whee!
+ *
+ * Created by cypressf and greenteawarrior on 3/7/14. Yay for collaborative code!
+ *
+ * resources:
+ * http://developer.android.com/reference/java/net/DatagramSocket.html
+ * http://developer.android.com/guide/topics/media/camera.html
  */
+
 public class UDPSender implements Runnable {
 
+    //initializing the things here so they're accessible by all the functions in this class :-)
     private Camera camera;
     private DatagramSocket socket;
     private MediaRecorder recorder;
@@ -28,6 +37,7 @@ public class UDPSender implements Runnable {
     @Override
     public void run() {
         try {
+            //Set up the socket things
             foreign_address  = InetAddress.getByName(address_string);
             socket = new DatagramSocket(local_port);
             sendTestPacket();
@@ -39,6 +49,7 @@ public class UDPSender implements Runnable {
     }
 
     public static Camera getCameraInstance(){
+        //Get ready for the camera
         Camera c = null;
         try {
             c = Camera.open(); // attempt to get a Camera instance
@@ -51,6 +62,7 @@ public class UDPSender implements Runnable {
     }
 
     private void sendTestPacket() throws IOException {
+        //Seeing if the android to webapp communication worked with a "hello world" string. Woot!
         String message = "hello world";
         byte[] data = message.getBytes();
         DatagramPacket packet = new DatagramPacket(data, data.length, foreign_address, foreign_port);
@@ -58,6 +70,9 @@ public class UDPSender implements Runnable {
     }
 
     private void startRecording() throws IOException {
+        // Strategy: Record video and instead of saving it to a filepath, save it to the existing socket
+
+        // Getting the socket "filepath"
         ParcelFileDescriptor pfd = ParcelFileDescriptor.fromDatagramSocket(socket);
         if (pfd == null) {
             cleanShutdown();
@@ -67,6 +82,7 @@ public class UDPSender implements Runnable {
 
         FileDescriptor fd = pfd.getFileDescriptor();
 
+        // Video record/stream time!
         camera = getCameraInstance();
         recorder = new MediaRecorder();
         recorder.setCamera(camera);
@@ -80,6 +96,9 @@ public class UDPSender implements Runnable {
     }
 
     private void cleanShutdown() {
+        //A convenient function to tie up loose ends when testing/running the app.
+        //Takes care of the recorder, camera, and sockets.
+
         if (recorder != null) {
             recorder.stop();
             recorder.reset();   // You can reuse the object by going back to setAudioSource() step
