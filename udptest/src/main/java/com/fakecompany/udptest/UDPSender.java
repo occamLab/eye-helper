@@ -1,6 +1,5 @@
 package com.fakecompany.udptest;
 
-import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.ParcelFileDescriptor;
@@ -25,51 +24,46 @@ import java.net.InetAddress;
 
 public class UDPSender implements Runnable {
 
-    //initializing the things here so they're accessible by all the functions in this class :-)
-    private Camera camera;
+    // initializing the things here so they're accessible by all the functions in this class :-)
     private DatagramSocket socket;
     private MediaRecorder recorder;
-    private String address_string = "10.7.88.32";
+    private String address_string = "192.168.51.219";
     private int foreign_port = 8888;
     private int local_port = 8888;
     private InetAddress foreign_address;
+    private MainActivity activity;
+
+    public UDPSender(MainActivity activity) {
+        this.activity = activity;
+    }
 
     @Override
     public void run() {
         try {
-            //Set up the socket things
+            // Set up the socket things
             foreign_address  = InetAddress.getByName(address_string);
             socket = new DatagramSocket(local_port);
-            sendTestPacket();
-            startRecording();
         } catch (Exception e) {
             e.printStackTrace();
             cleanShutdown();
         }
+        sendTestPacket();
+        startRecording();
     }
 
-    public static Camera getCameraInstance(){
-        //Get ready for the camera
-        Camera c = null;
-        try {
-            c = Camera.open(); // attempt to get a Camera instance
-        }
-        catch (Exception e){
-            Log.d("UDP", "camera failed to open");
-            e.printStackTrace();
-        }
-        return c; // returns null if camera is unavailable
-    }
-
-    private void sendTestPacket() throws IOException {
+    private void sendTestPacket() {
         //Seeing if the android to webapp communication worked with a "hello world" string. Woot!
         String message = "hello world";
         byte[] data = message.getBytes();
         DatagramPacket packet = new DatagramPacket(data, data.length, foreign_address, foreign_port);
-        socket.send(packet);
+        try {
+            socket.send(packet);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void startRecording() throws IOException {
+    private void startRecording() {
         // Strategy: Record video and instead of saving it to a filepath, save it to the existing socket
 
         // Getting the socket "filepath"
@@ -81,16 +75,25 @@ public class UDPSender implements Runnable {
         }
 
         FileDescriptor fd = pfd.getFileDescriptor();
-
         // Video record/stream time!
-        camera = getCameraInstance();
         recorder = new MediaRecorder();
-        recorder.setCamera(camera);
+        recorder.setCamera(activity.camera);
         recorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         recorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
         recorder.setOutputFile(fd);
-        recorder.prepare();
+        recorder.setPreviewDisplay(activity.preview.mHolder.getSurface());
+
+        try {
+            recorder.prepare();
+        } catch (IllegalStateException e) {
+            Log.d("UDP", "IllegalStateException preparing MediaRecorder: " + e.getMessage());
+            cleanShutdown();
+        } catch (IOException e) {
+            Log.d("UDP", "IOException preparing MediaRecorder: " + e.getMessage());
+            cleanShutdown();
+        }
+
         recorder.start();   // Recording is now started
 
     }
@@ -101,11 +104,13 @@ public class UDPSender implements Runnable {
 
         if (recorder != null) {
             recorder.stop();
-            recorder.reset();   // You can reuse the object by going back to setAudioSource() step
-            recorder.release(); // Now the object cannot be reused
+            recorder.reset();   // clear recorder configuration
+            recorder.release(); // release the recorder object
+            recorder = null;
         }
-        if (camera != null) {
-            camera.release();
+        if (activity.camera != null) {
+            activity.camera.stopPreview();
+            activity.camera.release();
         }
         if (socket != null) {
             socket.close();
