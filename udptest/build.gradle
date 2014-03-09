@@ -19,6 +19,6 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:+'
+    compile "com.android.support:appcompat-v7:18.0.+" //important!! make sure you sync your project with gradle files
     compile fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
 }

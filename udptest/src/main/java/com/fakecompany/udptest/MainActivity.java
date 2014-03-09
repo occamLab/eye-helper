@@ -1,37 +1,45 @@
 package com.fakecompany.udptest;
 
 import android.hardware.Camera;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.os.Build;
 import android.widget.Button;
+import android.widget.FrameLayout;
 
 public class MainActivity extends ActionBarActivity {
+    public Camera camera;
+    public CameraPreview preview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Describes what's happening when the app starts up
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        findViewById(R.id.send_message).setOnClickListener(new Button.OnClickListener() {
+        camera = getCameraInstance();
+        preview = new CameraPreview(this, camera);
+        ((FrameLayout) findViewById(R.id.camera_preview)).addView(preview);
+        final Thread udpSender = new Thread(new UDPSender(this));
+
+        findViewById(R.id.button_capture).setOnClickListener(new Button.OnClickListener() {
+
             @Override
             public void onClick(View v) {
-                new Thread(new UDPSender()).start();
+                // We want to start a new thread - in which the socket stuff is always happening
+                // (should not interfere with the UI thread)
+                udpSender.start();
             }
         });
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        
+        // default thing for now
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
@@ -39,6 +47,8 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // default thing for now
+
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -47,6 +57,19 @@ public class MainActivity extends ActionBarActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public static Camera getCameraInstance(){
+        // Get ready for the camera
+        Camera c = null;
+        try {
+            c = Camera.open(); // attempt to get a Camera instance
+        }
+        catch (Exception e){
+            Log.d("UDP", "camera failed to open");
+            e.printStackTrace();
+        }
+        return c; // returns null if camera is unavailable
     }
 
 }
