@@ -25,13 +25,8 @@ public class UDPSender implements Runnable{
         try {
             foreign_address  = InetAddress.getByName(address_string);
             socket = new DatagramSocket(local_port);
-            String message = "hello world";
-            byte[] data = message.getBytes();
-            DatagramPacket packet = new DatagramPacket(data, data.length, foreign_address, foreign_port);
-            socket.send(packet);
-            Log.d("UDP", "trying to hello world");
-            socket.close();
-            Log.d("UDP", "socket closed");
+            sendTestPacket();
+            cleanShutdown();
         } catch (Exception e) {
             e.printStackTrace();
             cleanShutdown();
@@ -42,13 +37,16 @@ public class UDPSender implements Runnable{
     private void sendTestPacket() throws IOException {
         String message = "hello world";
         byte[] data = message.getBytes();
+        Log.d("UDP", "trying to hello world");
         DatagramPacket packet = new DatagramPacket(data, data.length, foreign_address, foreign_port);
         socket.send(packet);
+
     }
 
     private void cleanShutdown() {
         if (socket != null) {
             socket.close();
+            Log.d("UDP", "socket closed");
         }
     }
 
