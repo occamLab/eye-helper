@@ -15,7 +15,7 @@ import java.net.InetAddress;
 public class UDPSender implements Runnable{
     private DatagramSocket socket;
     private MediaRecorder recorder;
-    private String address_string = "192.168.51.219"; //use ip addr command in linux
+    private String address_string = "192.168.48.198"; //use ip addr command in linux
     private int foreign_port = 8888;
     private int local_port = 8888;
     private InetAddress foreign_address;
