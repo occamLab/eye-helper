@@ -67,7 +67,8 @@ public class MainActivity extends ActionBarActivity {
                             mCamera.lock();         // take camera access back from MediaRecorder
 
                             // inform the user that recording has stopped
-                            Log.d(TAG, "Capture");
+                            Log.d(TAG, "Stopped recording");
+                            //this.setText("Record"); //we'll find some way to set the button label text...
                             isRecording = false;
                         } else {
                             // initialize video camera
@@ -77,7 +78,8 @@ public class MainActivity extends ActionBarActivity {
                                 mMediaRecorder.start();
 
                                 // inform the user that recording has started
-                                Log.d(TAG, "Start");
+                                Log.d(TAG, "Start recording");
+                                //this.setText("Recording~"); //we'll find some way to set the button label text...
                                 isRecording = true;
                             } else {
                                 // prepare didn't work, release the camera
