@@ -44,6 +44,16 @@ public class MainActivity extends ActionBarActivity {
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(mPreview);
 
+        // Checking some storage things
+        if (! Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            Log.d(TAG, Environment.getExternalStorageState());
+            return;
+        }
+
+        Log.d(TAG, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath());
+
+        Log.d(TAG, "it survived");
+
         // Add a listener to the Capture button
         Button captureButton = (Button) findViewById(R.id.button_capture);
         captureButton.setOnClickListener(
@@ -198,14 +208,14 @@ public class MainActivity extends ActionBarActivity {
         // using Environment.getExternalStorageState() before doing this.
 
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "MyCameraApp");
+                Environment.DIRECTORY_PICTURES), "CameraDemo");
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
 
         // Create the storage directory if it does not exist
         if (! mediaStorageDir.exists()){
             if (! mediaStorageDir.mkdirs()){
-                Log.d("MyCameraApp", "failed to create directory");
+                Log.d("CameraDemo", "failed to create directory");
                 return null;
             }
         }
