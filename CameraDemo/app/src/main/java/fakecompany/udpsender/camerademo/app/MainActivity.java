@@ -211,6 +211,7 @@ public class MainActivity extends ActionBarActivity {
 
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES), "CameraDemo");
+        Log.d("CameraDemo", "starting to save the video file");
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
 
