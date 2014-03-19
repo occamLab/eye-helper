@@ -17,6 +17,8 @@ public class MainActivity extends ActionBarActivity {
         findViewById(R.id.send_message).setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //We want to start a new thread - in which the socket stuff is always happening
+                //(should not interfere with the UI thread)
                 new Thread(new UDPSender()).start();
             }
         });
