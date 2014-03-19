@@ -10,12 +10,15 @@ import java.net.InetAddress;
 
 /**
  * Created by greenteawarrior on 3/10/14.
+ *
+ * Sets up the UDP socket to send information to the webapp (currently just a hello world string,
+ * video data communication is a work in progress....)
  */
 
 public class UDPSender implements Runnable{
     private DatagramSocket socket;
     private MediaRecorder recorder;
-    private String address_string = "192.168.48.198"; //use ip addr command in linux
+    private String address_string = "192.168.48.198"; //use ip addr command in a linux terminal
     private int foreign_port = 8888;
     private int local_port = 8888;
     private InetAddress foreign_address;
