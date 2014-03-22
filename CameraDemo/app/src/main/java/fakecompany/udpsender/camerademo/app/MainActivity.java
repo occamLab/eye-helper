@@ -176,7 +176,6 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-
     /** Create a file Uri for saving an image or video */
     private static Uri getOutputMediaFileUri(int type){
         return Uri.fromFile(getOutputMediaFile(type));
@@ -216,7 +215,6 @@ public class MainActivity extends ActionBarActivity {
 
         return mediaFile;
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
