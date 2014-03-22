@@ -197,15 +197,15 @@ public class MainActivity extends ActionBarActivity {
         // using Environment.getExternalStorageState() before doing this.
 
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "CameraDemo");
-        Log.d("CameraDemo", "starting to save the video file");
+                Environment.DIRECTORY_PICTURES), "UDPSender_Emily");
+        Log.d("UDPSender_Emily", "starting to save the video file");
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
 
         // Create the storage directory if it does not exist
         if (! mediaStorageDir.exists()){
             if (! mediaStorageDir.mkdirs()){
-                Log.d("CameraDemo", "failed to create directory");
+                Log.d("UDPSender_Emily", "failed to create directory");
                 return null;
             }
         }
