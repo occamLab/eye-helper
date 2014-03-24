@@ -13,6 +13,8 @@ import java.net.InetAddress;
  *
  * Sets up the UDP socket to send information to the webapp (currently just a hello world string,
  * video data communication is a work in progress....)
+ *
+ * Should always be running in its own thread (not the UI or asynctask)
  */
 
 public class UDPSender implements Runnable{
