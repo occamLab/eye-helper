@@ -1,4 +1,16 @@
+# IDEA Ignores
+*.iml
+*.ipr
+*.iws
+*.DS_Store
 .gradle
-/local.properties
-/.idea/workspace.xml
-.DS_Store
+
+
+.idea/
+local.properties
+
+# Generic Android ignores
+bin/
+target
+gen/
+out/
