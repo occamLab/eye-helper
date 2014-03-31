@@ -30,6 +30,7 @@ public class MainActivity extends ActionBarActivity {
     private boolean isRecording = false;
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
+    private Button captureButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,41 +55,49 @@ public class MainActivity extends ActionBarActivity {
         Log.d(TAG, "it survived the external storage stage if statement");
 
         // Add a listener to the Capture button
-        Button captureButton = (Button) findViewById(R.id.button_capture);
+        captureButton = (Button) findViewById(R.id.button_capture);
         captureButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (isRecording) {
-                            // stop recording and release camera
-                            mMediaRecorder.stop();  // stop the recording
-                            releaseMediaRecorder(); // release the MediaRecorder object
-                            mCamera.lock();         // take camera access back from MediaRecorder
-
-                            // inform the user that recording has stopped
-                            Log.d(TAG, "Stopped recording");
-                            //this.setText("Record"); //we'll find some way to set the button label text...
-                            isRecording = false;
+                            stopRecording();
                         } else {
-                            // initialize video camera
-                            if (prepareVideoRecorder()) {
-                                // Camera is available and unlocked, MediaRecorder is prepared,
-                                // now you can start recording
-                                mMediaRecorder.start();
-
-                                // inform the user that recording has started
-                                Log.d(TAG, "Start recording");
-                                //this.setText("Recording~"); //we'll find some way to set the button label text...
-                                isRecording = true;
-                            } else {
-                                // prepare didn't work, release the camera
-                                releaseMediaRecorder();
-                                // inform user
-                            }
+                            startRecording();
                         }
                     }
                 }
         );
+    }
+
+    private void startRecording(){
+        // initialize video camera
+        if (prepareVideoRecorder()) {
+            // Camera is available and unlocked, MediaRecorder is prepared,
+            // now you can start recording
+            mMediaRecorder.start();
+
+            // inform the user that recording has started
+            Log.d(TAG, "Started recording");
+            captureButton.setText("Capturing..."); //we'll find some way to set the button label text...
+            isRecording = true;
+        } else {
+            // prepare didn't work, release the camera
+            releaseMediaRecorder();
+            // inform user
+        }
+    }
+
+    private void stopRecording(){
+        // stop recording and release camera
+        mMediaRecorder.stop();  // stop the recording
+        releaseMediaRecorder(); // release the MediaRecorder object
+        mCamera.lock();         // take camera access back from MediaRecorder
+
+        // inform the user that recording has stopped
+        Log.d(TAG, "Stopped recording");
+        captureButton.setText("Capture"); //we'll find some way to set the button label text...
+        isRecording = false;
     }
 
     /** Check if this device has a camera */
