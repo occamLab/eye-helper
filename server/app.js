@@ -29,7 +29,7 @@ app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-// UDP shenanigans
+// UDP shenanigans : communicating with the android phone
 // see http://nodejs.org/api/dgram.html for more deets
 var server = dgram.createSocket("udp4");
 
@@ -51,6 +51,17 @@ server.on("listening", function () {
 
 server.bind(8888);
 // server listening 0.0.0.0:8888
+
+
+// trying to send things to the phone
+// see http://nodejs.org/api/dgram.html and http://nodejs.org/api/buffer.html for more deets
+
+var message = new Buffer("Some bytes");
+var client = dgram.createSocket("udp4"); //do I need to create a different socket??
+//the inputs: buffer, offset, length, port, address, [callback]
+client.send(message, 0, message.length, 8888, "localhost", function(err, bytes) {
+  client.close();
+});
 
 // development only
 if ('development' == app.get('env')) {

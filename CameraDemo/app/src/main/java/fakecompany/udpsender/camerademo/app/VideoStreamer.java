@@ -7,15 +7,12 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-/**
- * Created by cypressf on 3/30/14.
- */
 public class VideoStreamer implements Runnable {
 
     // initializing the things here so they're accessible by all the functions in this class :-)
     private DatagramSocket socket;
 //    private MediaRecorder recorder;
-    private String address_string = "10.7.88.20";
+    private String address_string = "192.168.51.54";
     private int foreign_port = 8888;
     private int local_port = 8888;
     private InetAddress foreign_address;
