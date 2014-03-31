@@ -1,7 +1,9 @@
 package fakecompany.udpsender.camerademo.app;
 
+import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -28,6 +30,12 @@ public class VideoStreamer implements Runnable {
     @Override
     public void run() {
         Log.d(MainActivity.TAG, "starting thread");
+        createSocket();
+        sendTestPacket();
+        startRecording();
+    }
+
+    private void createSocket() {
         try {
             // Set up the socket things
             foreign_address  = InetAddress.getByName(address_string);
@@ -36,11 +44,7 @@ public class VideoStreamer implements Runnable {
             e.printStackTrace();
             cleanShutdown();
         }
-        sendTestPacket();
-        cleanShutdown();
-//        startRecording();
     }
-
     private void sendTestPacket() {
         //Seeing if the android to webapp communication worked with a "hello world" string. Woot!
         String message = "hello world";
@@ -53,20 +57,19 @@ public class VideoStreamer implements Runnable {
         }
     }
 
-    private void cleanShutdown() {
-        //A convenient function to tie up loose ends when testing/running the app.
-        //Takes care of the recorder, camera, and sockets.
+    private void startRecording(){
+        // Get the socket file descriptor
+        ParcelFileDescriptor pfd = ParcelFileDescriptor.fromDatagramSocket(socket);
+        if (pfd == null) {
+            cleanShutdown();
+            Log.e("UDP","couldn't get file pfd");
+            return;
+        }
+        FileDescriptor fd = pfd.getFileDescriptor();
+        activity.startRecording(fd);
+    }
 
-//        if (recorder != null) {
-//            recorder.stop();
-//            recorder.reset();   // clear recorder configuration
-//            recorder.release(); // release the recorder object
-//            recorder = null;
-//        }
-//        if (activity.camera != null) {
-//            activity.camera.stopPreview();
-//            activity.camera.release();
-//        }
+    public void cleanShutdown() {
         if (socket != null) {
             socket.close();
         }

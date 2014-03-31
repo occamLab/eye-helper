@@ -28,9 +28,10 @@ app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
-
+////////////////////////////////////////////////
 // UDP shenanigans
 // see http://nodejs.org/api/dgram.html for more deets
+////////////////////////////////////////////////
 var server = dgram.createSocket("udp4");
 
 server.on("error", function (err) {
@@ -57,6 +58,9 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
+////////////////////////////////////////////////
+// Website server for displaying video and such
+////////////////////////////////////////////////
 app.get('/', routes.index);
 app.get('/users', user.list);
 

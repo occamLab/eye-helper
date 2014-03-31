@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,6 +32,7 @@ public class MainActivity extends ActionBarActivity {
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
     private Button captureButton;
+    private VideoStreamer videoStreamer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,33 +65,34 @@ public class MainActivity extends ActionBarActivity {
                         if (isRecording) {
                             stopRecording();
                         } else {
-                            startRecording();
+                            startVideoStreamer();
                         }
                     }
                 }
         );
     }
 
-    private void startRecording(){
-
-        VideoStreamer videoStreamer = new VideoStreamer(this);
+    private void startVideoStreamer(){
+        videoStreamer = new VideoStreamer(this);
         Thread thread = new Thread(videoStreamer);
         thread.start();
+    }
 
+    public void startRecording(FileDescriptor fd) {
         // initialize video camera
-        if (prepareVideoRecorder()) {
+        if (prepareVideoRecorder(fd)) {
             // Camera is available and unlocked, MediaRecorder is prepared,
             // now you can start recording
             mMediaRecorder.start();
 
-
             // inform the user that recording has started
             Log.d(TAG, "Started recording");
-            captureButton.setText("Capturing..."); //we'll find some way to set the button label text...
+//            captureButton.setText("Capturing..."); //we'll find some way to set the button label text...
             isRecording = true;
         } else {
             // prepare didn't work, release the camera
             releaseMediaRecorder();
+
             // inform user
         }
     }
@@ -102,19 +105,8 @@ public class MainActivity extends ActionBarActivity {
 
         // inform the user that recording has stopped
         Log.d(TAG, "Stopped recording");
-        captureButton.setText("Capture"); //we'll find some way to set the button label text...
+//        captureButton.setText("Capture"); //we'll find some way to set the button label text...
         isRecording = false;
-    }
-
-    /** Check if this device has a camera */
-    private boolean checkCameraHardware(Context context) {
-        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
-            // this device has a camera
-            return true;
-        } else {
-            // no camera on this device
-            return false;
-        }
     }
 
     /** A safe way to get an instance of the Camera object. */
@@ -130,7 +122,7 @@ public class MainActivity extends ActionBarActivity {
         return c; // returns null if camera is unavailable
     }
 
-    private boolean prepareVideoRecorder(){
+    public boolean prepareVideoRecorder(FileDescriptor fd){
 
         //mCamera = getCameraInstance();
         mMediaRecorder = new MediaRecorder();
@@ -147,7 +139,7 @@ public class MainActivity extends ActionBarActivity {
         mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_LOW));
 
         // Step 4: Set output file
-        mMediaRecorder.setOutputFile(getOutputMediaFile(MEDIA_TYPE_VIDEO).toString());
+        mMediaRecorder.setOutputFile(fd);
 
         // Step 5: Set the preview output
         mMediaRecorder.setPreviewDisplay(mPreview.getHolder().getSurface());
@@ -167,7 +159,6 @@ public class MainActivity extends ActionBarActivity {
         return true;
     }
 
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -176,11 +167,18 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void releaseMediaRecorder(){
+
+        // stop recording the video
         if (mMediaRecorder != null) {
             mMediaRecorder.reset();   // clear recorder configuration
             mMediaRecorder.release(); // release the recorder object
             mMediaRecorder = null;
             mCamera.lock();           // lock camera for later use
+        }
+
+        // close the socket that we were using to stream the video
+        if (videoStreamer!=null){
+            videoStreamer.cleanShutdown();
         }
     }
 
@@ -189,46 +187,6 @@ public class MainActivity extends ActionBarActivity {
             mCamera.release();        // release the camera for other applications
             mCamera = null;
         }
-    }
-
-    /** Create a file Uri for saving an image or video */
-    private static Uri getOutputMediaFileUri(int type){
-        return Uri.fromFile(getOutputMediaFile(type));
-    }
-
-    /** Create a File for saving an image or video */
-    private static File getOutputMediaFile(int type){
-        // To be safe, you should check that the SDCard is mounted
-        // using Environment.getExternalStorageState() before doing this.
-
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "CameraDemo");
-        Log.d("CameraDemo", "starting to save the video file");
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
-
-        // Create the storage directory if it does not exist
-        if (! mediaStorageDir.exists()){
-            if (! mediaStorageDir.mkdirs()){
-                Log.d("CameraDemo", "failed to create directory");
-                return null;
-            }
-        }
-
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE){
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_"+ timeStamp + ".jpg");
-        } else if(type == MEDIA_TYPE_VIDEO) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "VID_"+ timeStamp + ".mp4");
-        } else {
-            return null;
-        }
-
-        return mediaFile;
     }
 
     @Override
