@@ -26,7 +26,7 @@ public class MainActivity extends ActionBarActivity {
     private Camera mCamera;
     private CameraPreview mPreview;
     private MediaRecorder mMediaRecorder;
-    private static final String TAG = "CameraDemo";
+    public static final String TAG = "CameraDemo";
     private boolean isRecording = false;
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
@@ -71,11 +71,17 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void startRecording(){
+
+        VideoStreamer videoStreamer = new VideoStreamer(this);
+        Thread thread = new Thread(videoStreamer);
+        thread.start();
+
         // initialize video camera
         if (prepareVideoRecorder()) {
             // Camera is available and unlocked, MediaRecorder is prepared,
             // now you can start recording
             mMediaRecorder.start();
+
 
             // inform the user that recording has started
             Log.d(TAG, "Started recording");
