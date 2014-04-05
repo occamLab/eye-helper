@@ -1,6 +1,7 @@
 package fakecompany.udpsender.camerademo.app;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
@@ -62,6 +63,10 @@ public class MainActivity extends ActionBarActivity {
                     public void onClick(View v) {
                         if (isRecording) {
                             stopRecording();
+
+                            //so the file appears in gallery (hopefully) instantaneously!
+                            //http://stackoverflow.com/questions/2170214/image-saved-to-sdcard-doesnt-appear-in-androids-gallery-app
+                            sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"+ Environment.getExternalStorageDirectory());
                         } else {
                             startRecording();
                         }
