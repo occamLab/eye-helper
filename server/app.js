@@ -13,6 +13,7 @@ var user = require('./routes/user');
 var http = require('http');
 var path = require('path');
 var dgram = require('dgram');
+var net = require('net');
 
 var app = express();
 
@@ -53,15 +54,28 @@ server.bind(8888);
 // server listening 0.0.0.0:8888
 
 
-// trying to send things to the phone
-// see http://nodejs.org/api/dgram.html and http://nodejs.org/api/buffer.html for more deets
-
-var message = new Buffer("Some bytes");
-var client = dgram.createSocket("udp4"); //do I need to create a different socket??
-//the inputs: buffer, offset, length, port, address, [callback]
-client.send(message, 0, message.length, 8888, "localhost", function(err, bytes) {
-  client.close();
+// TCP shenanigans: sending things to the phone
+var server = net.createServer(function(socket) { //'connection' listener
+  console.log('server connected');
+  console.log('remote address: ' + socket.remoteAddress);
+  console.log('remote port: ' + socket.remotePort);
+  console.log('local address: ' + socket.localAddress);
+  console.log('local port: ' + socket.localPort)
+  socket.on('end', function() {
+    console.log('server disconnected');
+  });
+  socket.write('hello (from the server)\r\n');
+  socket.write('bob (from the server)\r\n');
+  socket.pipe(socket);
 });
+server.listen(9999, function() { //'listening' listener
+  console.log('server bound');
+});
+
+
+
+
+
 
 // development only
 if ('development' == app.get('env')) {
