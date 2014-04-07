@@ -81,9 +81,6 @@ var TCPserver = net.createServer(function(socket) { //'connection' listener
     }
     // console.log('phones list: ' + phones);
   });
-  socket.write('hello (from the server)\r\n');
-  socket.write('bob (from the server)\r\n');
-  socket.pipe(socket).pipe(process.stdout);
 });
 TCPserver.listen(9999, function() { //'listening' listener
   console.log('server bound');
