@@ -1,7 +1,6 @@
 package fakecompany.udpsender.camerademo.app;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
@@ -9,6 +8,7 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -32,11 +32,21 @@ public class MainActivity extends ActionBarActivity {
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
     private Button captureButton;
+    private TextReceiver textReceiver;
+    private TextToSpeech speech;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        speech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                startTextReceiver();
+            }
+        });
+
 
         // Create an instance of Camera
         mCamera = getCameraInstance();
@@ -66,13 +76,33 @@ public class MainActivity extends ActionBarActivity {
 
                             //so the file appears in gallery (hopefully) instantaneously!
                             //http://stackoverflow.com/questions/2170214/image-saved-to-sdcard-doesnt-appear-in-androids-gallery-app
-                            sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"+ Environment.getExternalStorageDirectory());
+//                            sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"+ Environment.getExternalStorageDirectory());
                         } else {
                             startRecording();
                         }
                     }
                 }
         );
+
+        // Add a listener to the Capture button
+        (findViewById(R.id.button_send)).setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        textReceiver.send("test message from phone\r\n");
+                    }
+                }
+        );
+    }
+
+    private void startTextReceiver() {
+        textReceiver = new TextReceiver(this);
+        Thread thread = new Thread(textReceiver);
+        thread.start();
+    }
+
+    public void speak(String speakme) {
+        speech.speak(speakme, TextToSpeech.QUEUE_FLUSH, null);
     }
 
     private void startRecording(){

@@ -11,11 +11,24 @@
         android:layout_weight="1"
         />
 
-    <Button
-        android:id="@+id/button_capture"
-        android:text="Capture"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="40dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        />
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/button_capture"
+            android:text="Capture"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            />
+        <Button
+            android:id="@+id/button_send"
+            android:text="Send"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            />
+        </LinearLayout>
+
 </LinearLayout>
