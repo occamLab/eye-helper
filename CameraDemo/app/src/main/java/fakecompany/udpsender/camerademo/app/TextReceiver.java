@@ -17,7 +17,12 @@ public class TextReceiver implements Runnable {
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
+    private MainActivity activity;
     public boolean connected;
+
+    public TextReceiver(MainActivity activity) {
+        this.activity = activity;
+    }
 
     @Override
     public void run() {
@@ -31,6 +36,8 @@ public class TextReceiver implements Runnable {
                 message = in.readLine();
                 if (message != null) {
                     Log.d(MainActivity.TAG, message);
+                    activity.speak(message);
+
                 }
                 else {
                     disconnect();

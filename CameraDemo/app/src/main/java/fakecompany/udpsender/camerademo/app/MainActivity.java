@@ -1,7 +1,6 @@
 package fakecompany.udpsender.camerademo.app;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
@@ -9,6 +8,7 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -33,12 +33,19 @@ public class MainActivity extends ActionBarActivity {
     public static final int MEDIA_TYPE_VIDEO = 2;
     private Button captureButton;
     private TextReceiver textReceiver;
+    private TextToSpeech speech;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        startTextReceiver();
+
+        speech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                startTextReceiver();
+            }
+        });
 
 
         // Create an instance of Camera
@@ -89,9 +96,13 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void startTextReceiver() {
-        textReceiver = new TextReceiver();
+        textReceiver = new TextReceiver(this);
         Thread thread = new Thread(textReceiver);
         thread.start();
+    }
+
+    public void speak(String speakme) {
+        speech.speak(speakme, TextToSpeech.QUEUE_FLUSH, null);
     }
 
     private void startRecording(){
