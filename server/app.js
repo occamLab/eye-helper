@@ -59,15 +59,27 @@ UDPserver.bind(8888);
 var phones = {}; //address: object
 
 var TCPserver = net.createServer(function(socket) { //'connection' listener
-  phones[socket.remoteAddress] = socket;
+  var address = socket.remoteAddress;
+  phones[address] = socket;
+  io.sockets.emit('phones', Object.keys(phones)); 
+
   console.log('server connected');
-  console.log('remote address: ' + socket.remoteAddress);
+  console.log('remote address: ' + address);
   console.log('remote port: ' + socket.remotePort);
-  console.log('phones list: ' + phones)
+  console.log('phones list: ')
+  for (phone in phones) {
+    console.log(phone);
+  }
   socket.on('end', function() {
     console.log('server disconnected');
-    delete phones[socket.remoteAddress];
-    console.log('phones list: ' + phones);
+    console.log('deleting'+address);
+    delete phones[address];
+    io.sockets.emit('phones', Object.keys(phones)); 
+    console.log('phones list: ')
+    for (phone in phones) {
+      console.log(phone);
+    }
+    // console.log('phones list: ' + phones);
   });
   socket.write('hello (from the server)\r\n');
   socket.write('bob (from the server)\r\n');
@@ -81,7 +93,6 @@ TCPserver.listen(9999, function() { //'listening' listener
 
 //socket.io things
 io.sockets.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' }); 
   
   socket.on('message', function (data) {
     console.log(data);
