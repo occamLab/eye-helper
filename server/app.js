@@ -8,14 +8,14 @@ http://nodejs.org/api/dgram.html
 */
 
 var express = require('express');
-var routes = require('./routes');
+var app = express();
 var user = require('./routes/user');
-var http = require('http');
+var server = require('http').createServer(app);
+var io = require('socket.io').listen(server);
 var path = require('path');
 var dgram = require('dgram');
 var net = require('net');
 
-var app = express();
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -29,51 +29,64 @@ app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
+io.set('log level', 1); //reduces logging
 
 // UDP shenanigans : communicating with the android phone
 // see http://nodejs.org/api/dgram.html for more deets
-var server = dgram.createSocket("udp4");
+var UDPserver = dgram.createSocket("udp4");
 
-server.on("error", function (err) {
+UDPserver.on("error", function (err) {
   console.log("server error:\n" + err.stack);
   server.close();
 });
 
-server.on("message", function (msg, rinfo) {
+UDPserver.on("message", function (msg, rinfo) {
   console.log("server got: " + msg + " from " +
     rinfo.address + ":" + rinfo.port);
 });
 
-server.on("listening", function () {
+UDPserver.on("listening", function () {
   var address = server.address();
   console.log("server listening " +
       address.address + ":" + address.port);
 });
 
-server.bind(8888);
+UDPserver.bind(8888);
 // server listening 0.0.0.0:8888
 
 
 // TCP shenanigans: sending things to the phone
-var phones = []; //by socket
+var phones = {}; //address: object
 
-var server = net.createServer(function(socket) { //'connection' listener
-  phones.push(socket);
+var TCPserver = net.createServer(function(socket) { //'connection' listener
+  phones[socket.remoteAddress] = socket;
   console.log('server connected');
   console.log('remote address: ' + socket.remoteAddress);
   console.log('remote port: ' + socket.remotePort);
   console.log('phones list: ' + phones)
   socket.on('end', function() {
     console.log('server disconnected');
-    phones.splice(phones.indexOf(socket),1); //removing from phones
+    delete phones[socket.remoteAddress];
     console.log('phones list: ' + phones);
   });
   socket.write('hello (from the server)\r\n');
   socket.write('bob (from the server)\r\n');
   socket.pipe(socket).pipe(process.stdout);
 });
-server.listen(9999, function() { //'listening' listener
+TCPserver.listen(9999, function() { //'listening' listener
   console.log('server bound');
+});
+
+
+
+//socket.io things
+io.sockets.on('connection', function (socket) {
+  socket.emit('news', { hello: 'world' }); 
+  
+  socket.on('message', function (data) {
+    console.log(data);
+    phones[data.address].write(data.text + '\r\n');
+  });
 });
 
 
@@ -83,9 +96,12 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/', routes.index);
+app.get('/', function(req, res){
+  res.render('index', { title: 'eye-helper!!', phones:phones});
+  }
+);
 app.get('/users', user.list);
 
-http.createServer(app).listen(app.get('port'), function(){
+server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });

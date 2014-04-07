@@ -6,7 +6,8 @@
     "start": "node app.js"
   },
   "dependencies": {
-    "express": "3.4.8",
-    "jade": "*"
+    "express": "^3.4.8",
+    "jade": "^1.3.1",
+    "socket.io": "^0.9.16"
   }
 }
