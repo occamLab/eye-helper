@@ -55,7 +55,10 @@ server.bind(8888);
 
 
 // TCP shenanigans: sending things to the phone
+var phones = []; //by socket
+
 var server = net.createServer(function(socket) { //'connection' listener
+  phones.push(socket);
   console.log('server connected');
   console.log('remote address: ' + socket.remoteAddress);
   console.log('remote port: ' + socket.remotePort);
@@ -63,6 +66,7 @@ var server = net.createServer(function(socket) { //'connection' listener
   console.log('local port: ' + socket.localPort)
   socket.on('end', function() {
     console.log('server disconnected');
+    phones.splice(phones.indexof(socket),1); //removing from phones
   });
   socket.write('hello (from the server)\r\n');
   socket.write('bob (from the server)\r\n');
@@ -71,9 +75,6 @@ var server = net.createServer(function(socket) { //'connection' listener
 server.listen(9999, function() { //'listening' listener
   console.log('server bound');
 });
-
-
-
 
 
 
