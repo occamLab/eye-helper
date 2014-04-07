@@ -62,11 +62,11 @@ var server = net.createServer(function(socket) { //'connection' listener
   console.log('server connected');
   console.log('remote address: ' + socket.remoteAddress);
   console.log('remote port: ' + socket.remotePort);
-  console.log('local address: ' + socket.localAddress);
-  console.log('local port: ' + socket.localPort)
+  console.log('phones list: ' + phones)
   socket.on('end', function() {
     console.log('server disconnected');
-    phones.splice(phones.indexof(socket),1); //removing from phones
+    phones.splice(phones.indexOf(socket),1); //removing from phones
+    console.log('phones list: ' + phones);
   });
   socket.write('hello (from the server)\r\n');
   socket.write('bob (from the server)\r\n');
