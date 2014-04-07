@@ -66,7 +66,7 @@ var server = net.createServer(function(socket) { //'connection' listener
   });
   socket.write('hello (from the server)\r\n');
   socket.write('bob (from the server)\r\n');
-  socket.pipe(socket);
+  socket.pipe(socket).pipe(process.stdout);
 });
 server.listen(9999, function() { //'listening' listener
   console.log('server bound');
