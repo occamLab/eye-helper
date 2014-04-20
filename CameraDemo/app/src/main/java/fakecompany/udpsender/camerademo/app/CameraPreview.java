@@ -12,22 +12,33 @@ import java.io.IOException;
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private Camera mCamera;
+    private int mFrameCount;
+    private Camera.Size mPreviewSize;
+    private VideoStreamer mVideoStreamer;
 
-    public CameraPreview(Context context, Camera camera) {
+    public CameraPreview(Context context, Camera camera, VideoStreamer videoStreamer) {
         super(context);
+        mVideoStreamer = videoStreamer;
         mCamera = camera;
+        Camera.Parameters param = mCamera.getParameters();
+        param.setPreviewSize(320, 240);
+        //List<Integer> lislis = param.getSupportedPreviewFormats();
+        //param.setPreviewFormat(ImageFormat.JPEG);
+        mCamera.setParameters(param);
+        //int form = param.getPreviewFormat();
+        mPreviewSize = mCamera.getParameters().getPreviewSize();
 
-        // Install a SurfaceHolder.Callback so we get notified when the
+        // Install a SurfaceHolder. Callback so we get notified when the
         // underlying surface is created and destroyed.
         mHolder = getHolder();
         mHolder.addCallback(this);
-        // deprecated setting, but required on Android versions prior to 3.0
-        mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
+    @Override
     public void surfaceCreated(SurfaceHolder holder) {
         // The Surface has been created, now tell the camera where to draw the preview.
         try {
+            // TODO: Sometimes the app crashes here. Fix.
             mCamera.setPreviewDisplay(holder);
             mCamera.startPreview();
         } catch (IOException e) {
@@ -35,10 +46,12 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
+    @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         // empty. Take care of releasing the Camera preview in your activity.
     }
 
+    @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
         // If your preview can change or rotate, take care of those events here.
         // Make sure to stop the preview before resizing or reformatting it.
@@ -55,12 +68,19 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             // ignore: tried to stop a non-existent preview
         }
 
-        // set preview size and make any resize, rotate or
-        // reformatting changes here
-
-        // start preview with new settings
         try {
             mCamera.setPreviewDisplay(mHolder);
+            mCamera.setPreviewCallback(new Camera.PreviewCallback() {
+                @Override
+                public void onPreviewFrame(byte[] data, Camera camera) {
+                    // Log.d(TAG, "Preview Callback in CameraPreview.java. mFrameCount = " + mFrameCount);
+                    if (mFrameCount++ >= 3) {
+                        mFrameCount = 0;
+                        Log.d(MainActivity.TAG, "another frame will be sent");
+                        mVideoStreamer.sendFrame(data, mPreviewSize.width, mPreviewSize.height);
+                    }
+                }
+            });
             mCamera.startPreview();
 
         } catch (Exception e){
