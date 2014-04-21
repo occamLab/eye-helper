@@ -1,6 +1,9 @@
 package fakecompany.udpsender.camerademo.app;
 
 import android.content.Context;
+import android.graphics.ImageFormat;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -20,6 +23,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private SurfaceHolder mHolder;
     private Camera mCamera;
     private int mFrameCount;
+    private int mPreviewWidth, mPreviewHeight;
+
 
     public CameraPreview(Context context, Camera camera) {
         super(context);
@@ -30,7 +35,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         //param.setPreviewFormat(ImageFormat.JPEG);
         mCamera.setParameters(param);
         //int form = param.getPreviewFormat();
-
+        Camera.Size size = mCamera.getParameters().getPreviewSize();
+        mPreviewHeight = size.height;
+        mPreviewWidth = size.width;
         // Install a SurfaceHolder. Callback so we get notified when the
         // underlying surface is created and destroyed.
         mHolder = getHolder();
@@ -79,7 +86,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                     // Log.d(TAG, "Preview Callback in CameraPreview.java. mFrameCount = " + mFrameCount);
                     if (mFrameCount++ >= 3) {
                         mFrameCount = 0;
-                        VideoStreamer videoStreamer = new VideoStreamer(data, "http://10.7.88.80:8888");
+                        YuvImage img = new YuvImage(data, ImageFormat.NV21, mPreviewWidth, mPreviewHeight, null);
+                        VideoStreamer videoStreamer = new VideoStreamer(img, "http://10.7.88.80:8888", mPreviewWidth, mPreviewHeight);
                         Thread imageSenderThread = new Thread(videoStreamer);
                         imageSenderThread.start();
                     }

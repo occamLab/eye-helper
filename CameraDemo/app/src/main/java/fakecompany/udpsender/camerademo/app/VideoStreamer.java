@@ -1,5 +1,8 @@
 package fakecompany.udpsender.camerademo.app;
 
+import android.graphics.ImageFormat;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
@@ -10,12 +13,16 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class VideoStreamer implements Runnable {
-    private byte[] mData;
+    private YuvImage mImg;
     private String mAddress;
+    private int mWidth;
+    private int mHeight;
 
-    public VideoStreamer(byte[] data, String address) {
-        mData = data;
+    public VideoStreamer(YuvImage img, String address, int width, int height) {
+        mImg = img;
         mAddress = address;
+        mWidth = width;
+        mHeight = height;
     }
 
     @Override
@@ -29,7 +36,7 @@ public class VideoStreamer implements Runnable {
             urlConnection.setChunkedStreamingMode(0);
 
             OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
-            out.write(mData);
+            mImg.compressToJpeg(new Rect(0,0,mWidth,mHeight), 20, out);
             out.flush();
             out.close();
 
