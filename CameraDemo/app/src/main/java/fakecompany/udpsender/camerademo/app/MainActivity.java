@@ -1,28 +1,19 @@
 package fakecompany.udpsender.camerademo.app;
 
-import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
-
-import java.io.FileDescriptor;
 
 
 public class MainActivity extends ActionBarActivity {
     private Camera mCamera;
     private CameraPreview mPreview;
     public static final String TAG = "CameraDemo";
-    private boolean isRecording = false;
-    private Button captureButton;
-    private VideoStreamer mVideoStreamer;
     private TextReceiver textReceiver;
     private TextToSpeech speech;
 
@@ -37,9 +28,6 @@ public class MainActivity extends ActionBarActivity {
                 startTextReceiver();
             }
         });
-        mVideoStreamer = new VideoStreamer(this);
-        Thread videoThread = new Thread(mVideoStreamer);
-        videoThread.start();
         setupCamera();
 
     }
@@ -58,7 +46,7 @@ public class MainActivity extends ActionBarActivity {
         // Create an instance of Camera
         mCamera = getCameraInstance();
         // Create our Preview view and set it as the content of our activity.
-        mPreview = new CameraPreview(this, mCamera, mVideoStreamer);
+        mPreview = new CameraPreview(this, mCamera);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(mPreview);
     }

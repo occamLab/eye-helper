@@ -6,19 +6,23 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /** A basic Camera preview class */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private Camera mCamera;
     private int mFrameCount;
-    private Camera.Size mPreviewSize;
-    private VideoStreamer mVideoStreamer;
 
-    public CameraPreview(Context context, Camera camera, VideoStreamer videoStreamer) {
+    public CameraPreview(Context context, Camera camera) {
         super(context);
-        mVideoStreamer = videoStreamer;
         mCamera = camera;
         Camera.Parameters param = mCamera.getParameters();
         param.setPreviewSize(320, 240);
@@ -26,7 +30,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         //param.setPreviewFormat(ImageFormat.JPEG);
         mCamera.setParameters(param);
         //int form = param.getPreviewFormat();
-        mPreviewSize = mCamera.getParameters().getPreviewSize();
 
         // Install a SurfaceHolder. Callback so we get notified when the
         // underlying surface is created and destroyed.
@@ -76,8 +79,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                     // Log.d(TAG, "Preview Callback in CameraPreview.java. mFrameCount = " + mFrameCount);
                     if (mFrameCount++ >= 3) {
                         mFrameCount = 0;
-                        Log.d(MainActivity.TAG, "another frame will be sent");
-                        mVideoStreamer.sendFrame(data, mPreviewSize.width, mPreviewSize.height);
+                        VideoStreamer videoStreamer = new VideoStreamer(data, "http://10.7.88.80:8888");
+                        Thread imageSenderThread = new Thread(videoStreamer);
+                        imageSenderThread.start();
                     }
                 }
             });
