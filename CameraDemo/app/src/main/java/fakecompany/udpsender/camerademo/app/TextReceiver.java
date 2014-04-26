@@ -49,16 +49,6 @@ public class TextReceiver implements Runnable {
         }
 
     }
-    public void send(String message) {
-        if (connected && message != null) {
-            out.write(message);
-            out.flush();
-        }
-        else {
-            Log.e(MainActivity.TAG, "Couldn't send message: " + message);
-            Log.e(MainActivity.TAG, "Connected: " + connected);
-        }
-    }
 
     private void disconnect() {
         connected = false;
