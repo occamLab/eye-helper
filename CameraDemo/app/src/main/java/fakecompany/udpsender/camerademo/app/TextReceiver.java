@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 
 /**
  * Created by cypressf on 4/6/14.
@@ -14,7 +15,7 @@ import java.net.Socket;
  * text from the server. Upon receiving the text, we will simply log it for now.
  */
 public class TextReceiver implements Runnable {
-    private Socket socket;
+    public Socket socket;
     private BufferedReader in;
     private PrintWriter out;
     private MainActivity activity;
@@ -36,9 +37,7 @@ public class TextReceiver implements Runnable {
             out = new PrintWriter(socket.getOutputStream());
             connected = true;
             while(connected) {
-                Log.d(MainActivity.TAG, "reading line");
                 message = in.readLine();
-                Log.d(MainActivity.TAG, "read line");
                 if (message != null) {
                     Log.d(MainActivity.TAG, message);
                     activity.speak(message);
@@ -47,15 +46,14 @@ public class TextReceiver implements Runnable {
                     disconnect();
                 }
             }
-        } catch (IOException e) {
+        } catch (SocketException e) {
             disconnect();
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.d(MainActivity.TAG, "TextReceiver has ended");
     }
 
     public void disconnect() {
-        Log.d(MainActivity.TAG, "trying to disconnect");
         connected = false;
         if (socket != null) {
             if (socket.isConnected()) {
@@ -63,7 +61,6 @@ public class TextReceiver implements Runnable {
                     in.close();
                     out.close();
                     socket.close();
-                    Log.d(MainActivity.TAG, "stopped textreceiver");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

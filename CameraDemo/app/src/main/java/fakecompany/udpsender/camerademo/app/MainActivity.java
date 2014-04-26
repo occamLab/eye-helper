@@ -7,6 +7,8 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.FrameLayout;
 
+import java.io.IOException;
+
 
 public class MainActivity extends Activity {
     private Camera mCamera;
@@ -16,6 +18,7 @@ public class MainActivity extends Activity {
     private TextReceiver mTextReceiver;
     private TextToSpeech speech;
     private FrameLayout frameLayout;
+    private Thread textReceiverThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +39,7 @@ public class MainActivity extends Activity {
         mCamera = getCameraInstance();
         mPreview = new CameraPreview(this, mCamera, serverAddress);
         frameLayout.addView(mPreview);
+        startTextReceiver();
     }
 
 
@@ -44,6 +48,16 @@ public class MainActivity extends Activity {
     protected void onPause() {
         super.onPause();
 
+        try {
+            mTextReceiver.socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            textReceiverThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         if (mCamera != null) {
             mCamera.setPreviewCallback(null);
             mPreview.mHolder.removeCallback(mPreview);
@@ -60,8 +74,8 @@ public class MainActivity extends Activity {
 
     private void startTextReceiver() {
         mTextReceiver = new TextReceiver(this);
-        Thread thread = new Thread(mTextReceiver);
-        thread.start();
+        textReceiverThread = new Thread(mTextReceiver);
+        textReceiverThread.start();
     }
 
     public void speak(String speakMe) {
