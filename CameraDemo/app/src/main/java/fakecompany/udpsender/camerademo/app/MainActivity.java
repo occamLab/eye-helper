@@ -18,6 +18,7 @@ public class MainActivity extends Activity {
     private TextReceiver mTextReceiver;
     private TextToSpeech speech;
     private FrameLayout frameLayout;
+    private boolean canSpeak = false;
     private Thread textReceiverThread;
 
     @Override
@@ -28,7 +29,7 @@ public class MainActivity extends Activity {
         speech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
-                startTextReceiver();
+                canSpeak = true;
             }
         });
     }
@@ -43,16 +44,11 @@ public class MainActivity extends Activity {
     }
 
 
-
     @Override
     protected void onPause() {
         super.onPause();
 
-        try {
-            mTextReceiver.socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        mTextReceiver.disconnect();
         try {
             textReceiverThread.join();
         } catch (InterruptedException e) {
@@ -71,6 +67,12 @@ public class MainActivity extends Activity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        speech.shutdown();
+    }
+
 
     private void startTextReceiver() {
         mTextReceiver = new TextReceiver(this);
@@ -79,7 +81,9 @@ public class MainActivity extends Activity {
     }
 
     public void speak(String speakMe) {
-        speech.speak(speakMe, TextToSpeech.QUEUE_FLUSH, null);
+        if (canSpeak){
+            speech.speak(speakMe, TextToSpeech.QUEUE_FLUSH, null);
+        }
     }
 
 
