@@ -28,7 +28,7 @@ public class TextReceiver implements Runnable {
     public void run() {
         try {
             String message;
-            socket = new Socket("10.7.88.80", 9999);
+            socket = new Socket(activity.serverAddress, 9999);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream());
             connected = true;

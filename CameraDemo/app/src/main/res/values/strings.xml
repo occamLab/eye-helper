@@ -4,5 +4,5 @@
     <string name="app_name">CameraDemo</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-
+    <string name="glass_voice_trigger">start eye-helper</string>
 </resources>

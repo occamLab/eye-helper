@@ -14,6 +14,7 @@ public class MainActivity extends ActionBarActivity {
     private Camera mCamera;
     private CameraPreview mPreview;
     public static final String TAG = "CameraDemo";
+    public String serverAddress = "192.168.48.237";
     private TextReceiver textReceiver;
     private TextToSpeech speech;
 
@@ -46,7 +47,7 @@ public class MainActivity extends ActionBarActivity {
         // Create an instance of Camera
         mCamera = getCameraInstance();
         // Create our Preview view and set it as the content of our activity.
-        mPreview = new CameraPreview(this, mCamera);
+        mPreview = new CameraPreview(this, mCamera, serverAddress);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(mPreview);
     }
