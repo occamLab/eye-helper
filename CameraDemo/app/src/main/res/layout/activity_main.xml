@@ -11,10 +11,4 @@
         android:layout_weight="1"
         />
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="40dp"
-        android:layout_height="wrap_content">
-        </LinearLayout>
-
 </LinearLayout>
