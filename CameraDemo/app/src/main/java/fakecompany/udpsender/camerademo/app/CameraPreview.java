@@ -20,7 +20,7 @@ import java.net.URL;
 
 /** A basic Camera preview class */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
-    private SurfaceHolder mHolder;
+    public SurfaceHolder mHolder;
     private Camera mCamera;
     private int mFrameCount;
     private int mPreviewWidth, mPreviewHeight;
@@ -33,10 +33,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         this.serverAddress = serverAddress;
         Camera.Parameters param = mCamera.getParameters();
         param.setPreviewSize(320, 240);
-        //List<Integer> lislis = param.getSupportedPreviewFormats();
-        //param.setPreviewFormat(ImageFormat.JPEG);
         mCamera.setParameters(param);
-        //int form = param.getPreviewFormat();
         Camera.Size size = mCamera.getParameters().getPreviewSize();
         mPreviewHeight = size.height;
         mPreviewWidth = size.width;
@@ -50,7 +47,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceCreated(SurfaceHolder holder) {
         // The Surface has been created, now tell the camera where to draw the preview.
         try {
-            // TODO: Sometimes the app crashes here. Fix.
             mCamera.setPreviewDisplay(holder);
             mCamera.startPreview();
         } catch (IOException e) {
@@ -60,7 +56,13 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        // empty. Take care of releasing the Camera preview in your activity.
+        if (mCamera != null) {
+            mCamera.setPreviewCallback(null);
+            mHolder.removeCallback(this);
+            mCamera.stopPreview();
+            mCamera.release();
+            mCamera = null;
+        }
     }
 
     @Override

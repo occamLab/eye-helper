@@ -26,18 +26,22 @@ public class TextReceiver implements Runnable {
 
     @Override
     public void run() {
+        Log.d(MainActivity.TAG, "Started text receiver");
         try {
             String message;
+            Log.d(MainActivity.TAG, "connecting to text sender");
             socket = new Socket(activity.serverAddress, 9999);
+            Log.d(MainActivity.TAG, "connected to text sender");
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream());
             connected = true;
             while(connected) {
+                Log.d(MainActivity.TAG, "reading line");
                 message = in.readLine();
+                Log.d(MainActivity.TAG, "read line");
                 if (message != null) {
                     Log.d(MainActivity.TAG, message);
                     activity.speak(message);
-
                 }
                 else {
                     disconnect();
@@ -47,10 +51,11 @@ public class TextReceiver implements Runnable {
             disconnect();
             e.printStackTrace();
         }
-
+        Log.d(MainActivity.TAG, "TextReceiver has ended");
     }
 
-    private void disconnect() {
+    public void disconnect() {
+        Log.d(MainActivity.TAG, "trying to disconnect");
         connected = false;
         if (socket != null) {
             if (socket.isConnected()) {
@@ -58,6 +63,7 @@ public class TextReceiver implements Runnable {
                     in.close();
                     out.close();
                     socket.close();
+                    Log.d(MainActivity.TAG, "stopped textreceiver");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

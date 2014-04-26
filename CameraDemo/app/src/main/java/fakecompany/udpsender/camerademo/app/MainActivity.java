@@ -13,42 +13,62 @@ public class MainActivity extends Activity {
     private CameraPreview mPreview;
     public static final String TAG = "CameraDemo";
     public String serverAddress = "192.168.48.237";
-    private TextReceiver textReceiver;
+    private TextReceiver mTextReceiver;
     private TextToSpeech speech;
+    private FrameLayout frameLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        frameLayout = (FrameLayout) findViewById(R.id.camera_preview);
         speech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 startTextReceiver();
             }
         });
-        setupCamera();
-
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mCamera = getCameraInstance();
+        mPreview = new CameraPreview(this, mCamera, serverAddress);
+        frameLayout.addView(mPreview);
+    }
+
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (mCamera != null) {
+            mCamera.setPreviewCallback(null);
+            mPreview.mHolder.removeCallback(mPreview);
+            mCamera.stopPreview();
+            mCamera.release();
+            mCamera = null;
+        }
+        if (mPreview != null) {
+            frameLayout.removeView(mPreview);
+            mPreview = null;
+        }
+    }
+
+
     private void startTextReceiver() {
-        textReceiver = new TextReceiver(this);
-        Thread thread = new Thread(textReceiver);
+        mTextReceiver = new TextReceiver(this);
+        Thread thread = new Thread(mTextReceiver);
         thread.start();
     }
 
-    public void speak(String speakme) {
-        speech.speak(speakme, TextToSpeech.QUEUE_FLUSH, null);
+    public void speak(String speakMe) {
+        speech.speak(speakMe, TextToSpeech.QUEUE_FLUSH, null);
     }
 
-    public void setupCamera(){
-        // Create an instance of Camera
-        mCamera = getCameraInstance();
-        // Create our Preview view and set it as the content of our activity.
-        mPreview = new CameraPreview(this, mCamera, serverAddress);
-        FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-        preview.addView(mPreview);
-    }
+
 
     /** A safe way to get an instance of the Camera object. */
     public static Camera getCameraInstance(){
@@ -62,18 +82,4 @@ public class MainActivity extends Activity {
         }
         return c; // returns null if camera is unavailable
     }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        releaseCamera();              // release the camera immediately on pause event
-    }
-
-    private void releaseCamera(){
-        if (mCamera != null){
-            mCamera.release();        // release the camera for other applications
-            mCamera = null;
-        }
-    }
-
 }
