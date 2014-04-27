@@ -20,21 +20,20 @@ import java.net.URL;
 
 /** A basic Camera preview class */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
-    private SurfaceHolder mHolder;
+    public SurfaceHolder mHolder;
     private Camera mCamera;
     private int mFrameCount;
     private int mPreviewWidth, mPreviewHeight;
+    private String serverAddress;
 
 
-    public CameraPreview(Context context, Camera camera) {
+    public CameraPreview(Context context, Camera camera, String serverAddress) {
         super(context);
         mCamera = camera;
+        this.serverAddress = serverAddress;
         Camera.Parameters param = mCamera.getParameters();
         param.setPreviewSize(320, 240);
-        //List<Integer> lislis = param.getSupportedPreviewFormats();
-        //param.setPreviewFormat(ImageFormat.JPEG);
         mCamera.setParameters(param);
-        //int form = param.getPreviewFormat();
         Camera.Size size = mCamera.getParameters().getPreviewSize();
         mPreviewHeight = size.height;
         mPreviewWidth = size.width;
@@ -48,7 +47,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceCreated(SurfaceHolder holder) {
         // The Surface has been created, now tell the camera where to draw the preview.
         try {
-            // TODO: Sometimes the app crashes here. Fix.
             mCamera.setPreviewDisplay(holder);
             mCamera.startPreview();
         } catch (IOException e) {
@@ -58,7 +56,13 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        // empty. Take care of releasing the Camera preview in your activity.
+        if (mCamera != null) {
+            mCamera.setPreviewCallback(null);
+            mHolder.removeCallback(this);
+            mCamera.stopPreview();
+            mCamera.release();
+            mCamera = null;
+        }
     }
 
     @Override
@@ -87,7 +91,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                     if (mFrameCount++ >= 3) {
                         mFrameCount = 0;
                         YuvImage img = new YuvImage(data, ImageFormat.NV21, mPreviewWidth, mPreviewHeight, null);
-                        VideoStreamer videoStreamer = new VideoStreamer(img, "http://10.7.88.80:8888", mPreviewWidth, mPreviewHeight);
+                        VideoStreamer videoStreamer = new VideoStreamer(img, "http://"+serverAddress+":8888", mPreviewWidth, mPreviewHeight);
                         Thread imageSenderThread = new Thread(videoStreamer);
                         imageSenderThread.start();
                     }

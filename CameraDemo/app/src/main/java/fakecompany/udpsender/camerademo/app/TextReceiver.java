@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 
 /**
  * Created by cypressf on 4/6/14.
@@ -26,9 +27,10 @@ public class TextReceiver implements Runnable {
 
     @Override
     public void run() {
+        Log.d(MainActivity.TAG, "Started text receiver");
         try {
             String message;
-            socket = new Socket("10.7.88.80", 9999);
+            socket = new Socket(activity.serverAddress, 9999);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream());
             connected = true;
@@ -37,40 +39,26 @@ public class TextReceiver implements Runnable {
                 if (message != null) {
                     Log.d(MainActivity.TAG, message);
                     activity.speak(message);
-
                 }
                 else {
                     disconnect();
                 }
             }
+        } catch (SocketException e) {
+            disconnect();
         } catch (IOException e) {
             disconnect();
             e.printStackTrace();
         }
-
-    }
-    public void send(String message) {
-        if (connected && message != null) {
-            out.write(message);
-            out.flush();
-        }
-        else {
-            Log.e(MainActivity.TAG, "Couldn't send message: " + message);
-            Log.e(MainActivity.TAG, "Connected: " + connected);
-        }
     }
 
-    private void disconnect() {
+    public void disconnect() {
         connected = false;
-        if (socket != null) {
-            if (socket.isConnected()) {
-                try {
-                    in.close();
-                    out.close();
-                    socket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        if (socket != null && socket.isConnected()) {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
