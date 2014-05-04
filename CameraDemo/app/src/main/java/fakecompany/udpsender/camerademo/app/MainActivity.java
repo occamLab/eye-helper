@@ -14,7 +14,7 @@ public class MainActivity extends Activity {
     private Camera mCamera;
     private CameraPreview mPreview;
     public static final String TAG = "CameraDemo";
-    public String serverAddress = "192.168.48.237";
+    public String serverAddress = "eye-helper.com";
     private TextReceiver mTextReceiver;
     private TextToSpeech speech;
     private FrameLayout frameLayout;

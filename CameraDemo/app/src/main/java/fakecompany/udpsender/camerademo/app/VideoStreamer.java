@@ -36,7 +36,7 @@ public class VideoStreamer implements Runnable {
             urlConnection.setChunkedStreamingMode(0);
 
             OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
-            mImg.compressToJpeg(new Rect(0,0,mWidth,mHeight), 20, out);
+            mImg.compressToJpeg(new Rect(0, 0, mWidth, mHeight), 20, out);
             out.flush();
             out.close();
 
@@ -44,6 +44,7 @@ public class VideoStreamer implements Runnable {
             in.close();
             urlConnection.disconnect();
         }
+
         catch (Exception e) {
             e.printStackTrace();
         }
