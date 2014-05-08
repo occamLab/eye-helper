@@ -24,13 +24,15 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private Camera mCamera;
     private int mFrameCount;
     private int mPreviewWidth, mPreviewHeight;
+    private String mVideoAddress;
     private String serverAddress;
 
 
-    public CameraPreview(Context context, Camera camera, String serverAddress) {
+    public CameraPreview(Context context, Camera camera, String serverAddress, String videoAddress) {
         super(context);
         mCamera = camera;
-        this.serverAddress = "videos."+serverAddress;
+        this.serverAddress = serverAddress;
+        mVideoAddress = videoAddress;
         Camera.Parameters param = mCamera.getParameters();
         param.setPreviewSize(320, 240);
         mCamera.setParameters(param);
@@ -91,7 +93,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                     if (mFrameCount++ >= 3) {
                         mFrameCount = 0;
                         YuvImage img = new YuvImage(data, ImageFormat.NV21, mPreviewWidth, mPreviewHeight, null);
-                        VideoStreamer videoStreamer = new VideoStreamer(img, "http://"+serverAddress, mPreviewWidth, mPreviewHeight);
+                        VideoStreamer videoStreamer = new VideoStreamer(img, mVideoAddress, mPreviewWidth, mPreviewHeight);
                         Thread imageSenderThread = new Thread(videoStreamer);
                         imageSenderThread.start();
                     }

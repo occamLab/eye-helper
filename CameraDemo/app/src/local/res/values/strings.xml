@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="server_uri">10.27.92.18</string>
+    <string name="video_uri">http://10.27.92.18:8888</string>
+</resources>
+
+

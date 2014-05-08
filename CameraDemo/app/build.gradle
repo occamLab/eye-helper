@@ -2,7 +2,7 @@ apply plugin: 'android'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.3"
+    buildToolsVersion '19.0.3'
 
     defaultConfig {
         minSdkVersion 14
@@ -11,9 +11,15 @@ android {
         versionName "1.0"
     }
     buildTypes {
-        release {
-            runProguard false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+    }
+    productFlavors {
+        local {
+            packageName "com.fakecompany.app.local"
+            versionName "1.0-local"
+        }
+        remote {
+            packageName "com.fakecompany.app.remote"
+            versionName "1.0-remote"
         }
     }
 }

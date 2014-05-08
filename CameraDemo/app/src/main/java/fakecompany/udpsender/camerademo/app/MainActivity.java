@@ -14,7 +14,7 @@ public class MainActivity extends Activity {
     private Camera mCamera;
     private CameraPreview mPreview;
     public static final String TAG = "CameraDemo";
-    public String serverAddress = "eye-helper.com";
+    public String serverAddress;
     private TextReceiver mTextReceiver;
     private TextToSpeech speech;
     private FrameLayout frameLayout;
@@ -25,6 +25,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        serverAddress = getString(R.string.server_uri);
         frameLayout = (FrameLayout) findViewById(R.id.camera_preview);
         speech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
@@ -38,7 +39,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         mCamera = getCameraInstance();
-        mPreview = new CameraPreview(this, mCamera, serverAddress);
+        mPreview = new CameraPreview(this, mCamera, serverAddress, getString(R.string.video_uri));
         frameLayout.addView(mPreview);
         startTextReceiver();
     }
