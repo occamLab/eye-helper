@@ -25,13 +25,12 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private int mFrameCount;
     private int mPreviewWidth, mPreviewHeight;
     private String mVideoAddress;
-    private String serverAddress;
+    private MainActivity activity;
 
-
-    public CameraPreview(Context context, Camera camera, String serverAddress, String videoAddress) {
+    public CameraPreview(Context context, Camera camera, String videoAddress) {
         super(context);
+        this.activity = (MainActivity) context;
         mCamera = camera;
-        this.serverAddress = serverAddress;
         mVideoAddress = videoAddress;
         Camera.Parameters param = mCamera.getParameters();
         param.setPreviewSize(320, 240);
@@ -90,10 +89,13 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 @Override
                 public void onPreviewFrame(byte[] data, Camera camera) {
                     // Log.d(TAG, "Preview Callback in CameraPreview.java. mFrameCount = " + mFrameCount);
+                    if (activity.ourUniqueAddress == null) {
+                        return;
+                    }
                     if (mFrameCount++ >= 3) {
                         mFrameCount = 0;
                         YuvImage img = new YuvImage(data, ImageFormat.NV21, mPreviewWidth, mPreviewHeight, null);
-                        VideoStreamer videoStreamer = new VideoStreamer(img, mVideoAddress, mPreviewWidth, mPreviewHeight);
+                        VideoStreamer videoStreamer = new VideoStreamer(img, mVideoAddress + "/" + activity.ourUniqueAddress, mPreviewWidth, mPreviewHeight);
                         Thread imageSenderThread = new Thread(videoStreamer);
                         imageSenderThread.start();
                     }

@@ -18,6 +18,7 @@ public class TextReceiver implements Runnable {
     private BufferedReader in;
     private MainActivity activity;
     public boolean connected;
+    private String addressMessage = "this is your unique address:";
 
     public TextReceiver(MainActivity activity) {
         this.activity = activity;
@@ -33,7 +34,11 @@ public class TextReceiver implements Runnable {
             connected = true;
             while(connected) {
                 message = in.readLine();
-                if (message != null) {
+                if (message != null && message.startsWith(addressMessage)) {
+                    String address = message.replace(addressMessage, "");
+                    activity.ourUniqueAddress = address;
+                }
+                else if (message != null) {
                     Log.d(MainActivity.TAG, message);
                     activity.speak(message);
                 }

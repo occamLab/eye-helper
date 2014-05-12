@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Eye-helper (local)</string>
-    <string name="server_uri">10.7.32.49</string>
-    <string name="video_uri">http://10.7.32.49:8888</string>
+    <string name="server_uri">10.7.88.157</string>
+    <string name="video_uri">http://10.7.88.157:8888</string>
 </resources>

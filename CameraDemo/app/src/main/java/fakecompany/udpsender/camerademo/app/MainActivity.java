@@ -7,8 +7,6 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.FrameLayout;
 
-import java.io.IOException;
-
 
 public class MainActivity extends Activity {
     private Camera mCamera;
@@ -20,6 +18,7 @@ public class MainActivity extends Activity {
     private FrameLayout frameLayout;
     private boolean canSpeak = false;
     private Thread textReceiverThread;
+    public String ourUniqueAddress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +37,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        mCamera = getCameraInstance();
-        mPreview = new CameraPreview(this, mCamera, serverAddress, getString(R.string.video_uri));
-        frameLayout.addView(mPreview);
+        startCamera();
         startTextReceiver();
     }
 
@@ -48,7 +45,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-
         mTextReceiver.disconnect();
         try {
             textReceiverThread.join();
@@ -66,6 +62,7 @@ public class MainActivity extends Activity {
             frameLayout.removeView(mPreview);
             mPreview = null;
         }
+        ourUniqueAddress = null;
     }
 
     @Override
@@ -74,6 +71,11 @@ public class MainActivity extends Activity {
         speech.shutdown();
     }
 
+    private void startCamera() {
+        mCamera = getCameraInstance();
+        mPreview = new CameraPreview(this, mCamera, getString(R.string.video_uri));
+        frameLayout.addView(mPreview);
+    }
 
     private void startTextReceiver() {
         mTextReceiver = new TextReceiver(this);
@@ -86,8 +88,6 @@ public class MainActivity extends Activity {
             speech.speak(speakMe, TextToSpeech.QUEUE_FLUSH, null);
         }
     }
-
-
 
     /** A safe way to get an instance of the Camera object. */
     public static Camera getCameraInstance(){
