@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pre-dex-items>
+
+    <item
+        dex="/home/greenteawarrior/eye-helper/CameraDemo/app/build/intermediates/pre-dexed/remote/debug/classes-cafb4a45ce78e653927240485ea15f5ff9bd3f98.jar"
+        jar="/home/greenteawarrior/eye-helper/CameraDemo/build/intermediates/exploded-aar/com.android.support/appcompat-v7/19.1.0/classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="3499ceba05ca1f6037c6a2fad73df8f636224a28"/>
+    <item
+        dex="/home/greenteawarrior/eye-helper/CameraDemo/app/build/intermediates/pre-dexed/remote/debug/support-v4-19.1.0-1bd09adae01d10f8f097a7c54535018843cfa550.jar"
+        jar="/opt/android-studio/sdk/extras/android/m2repository/com/android/support/support-v4/19.1.0/support-v4-19.1.0.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="85f201b380937e61a9dce6ca90ccf6872abbfb67"/>
+
+</pre-dex-items>
