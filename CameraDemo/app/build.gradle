@@ -12,7 +12,7 @@ android {
     }
     buildTypes {
         release {
-            runProguard falsecompile 'com.android.support:appcompat-v7:+'
+//            runProguard falsecompile 'com.android.support:appcompat-v7:19.+'
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
