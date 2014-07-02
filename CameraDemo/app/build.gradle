@@ -12,7 +12,7 @@ android {
     }
     buildTypes {
         release {
-            runProguard false
+            runProguard falsecompile 'com.android.support:appcompat-v7:+'
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
@@ -29,6 +29,6 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:+'
+    compile 'com.android.support:appcompat-v7:19.+'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
